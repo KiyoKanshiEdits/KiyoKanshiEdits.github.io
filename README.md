@@ -84,7 +84,7 @@
   <p>KiyoKanshiEdits is a content scheduling and publishing tool for anime creators. Connect your TikTok account and publish beat-synced anime edits on a consistent daily schedule.</p>
   <div class="cta-group">
     <button class="btn btn-primary" onclick="openModal()">Connect TikTok</button>
-    <a class="btn btn-outline" href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">View Example</a>
+    <button class="btn btn-outline" onclick="alert('Example videos coming soon!')">View Example</button>
   </div>
 </section>
 
@@ -155,7 +155,7 @@
       Continue with TikTok
     </button>
     <div class="or-divider">or</div>
-    <a class="example-link" href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">View example content on TikTok →</a>
+    <a class="example-link" href="#" onclick="alert('Example videos coming soon!'); return false;">View example content on TikTok →</a>
   </div>
 </section>
 
