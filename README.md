@@ -73,7 +73,7 @@
   <nav>
     <a href="#how-it-works">How It Works</a>
     <a href="#connect">Get Access</a>
-    <a href="https://www.tiktok.com/@kiyokanshi" target="_blank">TikTok</a>
+    <a href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">TikTok</a>
     <a href="/privacy.html">Privacy</a>
     <a href="/terms.html">Terms</a>
   </nav>
@@ -84,7 +84,7 @@
   <p>KiyoKanshiEdits is a content scheduling and publishing tool for anime creators. Connect your TikTok account and publish beat-synced anime edits on a consistent daily schedule.</p>
   <div class="cta-group">
     <button class="btn btn-primary" onclick="openModal()">Connect TikTok</button>
-    <a class="btn btn-outline" href="https://www.tiktok.com/@kiyokanshi" target="_blank">View Example</a>
+    <a class="btn btn-outline" href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">View Example</a>
   </div>
 </section>
 
@@ -155,7 +155,7 @@
       Continue with TikTok
     </button>
     <div class="or-divider">or</div>
-    <a class="example-link" href="https://www.tiktok.com/@kiyokanshi" target="_blank">View example content on TikTok →</a>
+    <a class="example-link" href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">View example content on TikTok →</a>
   </div>
 </section>
 
@@ -170,7 +170,7 @@
   <p>&copy; 2026 KiyoKanshiEdits. All rights reserved.</p>
   <a href="/privacy.html">Privacy Policy</a>
   <a href="/terms.html">Terms of Service</a>
-  <a href="https://www.tiktok.com/@kiyokanshi" target="_blank">TikTok</a>
+  <a href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">TikTok</a>
 </footer>
 
 <!-- Waitlist Modal -->
