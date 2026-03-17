@@ -173,6 +173,19 @@
   <a href="https://www.tiktok.com/@kiyokanshiedits" target="_blank">TikTok</a>
 </footer>
 
+
+<!-- Generate Modal -->
+<div class="modal-overlay" id="generateModalOverlay">
+  <div class="modal">
+    <button class="close-btn" onclick="closeGenerateModal()">×</button>
+    <div class="badge">Step 1 of 2</div>
+    <h3>Connect TikTok First</h3>
+    <p>To generate and publish your anime montage, you need to connect your TikTok account. This lets the tool post directly to your profile on your schedule.</p>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:12px;" onclick="closeGenerateModal(); openModal();">Connect TikTok to Continue</button>
+    <p style="color:#555;font-size:0.8em;text-align:center;">Your account is never stored on our servers.</p>
+  </div>
+</div>
+
 <!-- Waitlist Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
@@ -186,6 +199,12 @@
 </div>
 
 <script>
+  function openGenerateModal() {
+    document.getElementById('generateModalOverlay').classList.add('active');
+  }
+  function closeGenerateModal() {
+    document.getElementById('generateModalOverlay').classList.remove('active');
+  }
   function openModal() {
     document.getElementById('modalOverlay').classList.add('active');
   }
@@ -203,6 +222,9 @@
     document.querySelector('.modal input').style.display = 'none';
     document.querySelector('.modal .btn').style.display = 'none';
   }
+  document.getElementById('generateModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeGenerateModal();
+  });
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
   });
