@@ -83,8 +83,8 @@
   <h1>ANIME CONTENT,<br>BUILT FOR TIKTOK</h1>
   <p>KiyoKanshiEdits is a content scheduling and publishing tool for anime creators. Connect your TikTok account and publish beat-synced anime edits on a consistent daily schedule.</p>
   <div class="cta-group">
-    <button class="btn btn-primary" onclick="openModal()">Connect TikTok</button>
-    <button class="btn btn-outline" onclick="alert('Example videos coming soon!')">View Example</button>
+    <button class="btn btn-primary" onclick="connectTikTok()">Generate Anime Montage</button>
+    <button class="btn btn-outline" onclick="connectTikTok()">Connect TikTok</button>
   </div>
 </section>
 
@@ -150,7 +150,7 @@
     <div class="badge">Beta</div>
     <h3>Connect Your Account</h3>
     <p>Authenticate with TikTok to link your creator account and start publishing anime edits automatically.</p>
-    <button class="tiktok-btn" onclick="openModal()">
+    <button class="tiktok-btn" onclick="connectTikTok()">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.54V6.78a4.85 4.85 0 01-1.02-.09z"/></svg>
       Continue with TikTok
     </button>
@@ -199,6 +199,15 @@
 </div>
 
 <script>
+  function connectTikTok() {
+    const clientKey = 'awg25eq8turn2x11';
+    const redirectUri = encodeURIComponent('https://kiyokanshiedits.github.io/callback.html');
+    const scope = encodeURIComponent('video.publish,video.upload');
+    const state = 'website_demo';
+    const url = `https://www.tiktok.com/v2/auth/authorize/?client_key=${clientKey}&scope=${scope}&response_type=code&redirect_uri=${redirectUri}&state=${state}`;
+    window.location.href = url;
+  }
+
   function openGenerateModal() {
     document.getElementById('generateModalOverlay').classList.add('active');
   }
