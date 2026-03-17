@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connecting... — KiyoKanshiEdits</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #12121e; border: 1px solid #1e1e35; border-radius: 16px; padding: 50px 40px; max-width: 460px; width: 90%; text-align: center; }
+    .icon { font-size: 3em; margin-bottom: 20px; }
+    h1 { font-size: 1.6em; margin-bottom: 14px; }
+    p { color: #888; line-height: 1.7; margin-bottom: 20px; font-size: 0.95em; }
+    .badge { display: inline-block; background: linear-gradient(90deg, #7b2fff33, #ff3cac33); border: 1px solid #7b2fff55; border-radius: 20px; padding: 4px 14px; font-size: 0.8em; color: #cc88ff; margin-bottom: 20px; }
+    .progress { background: #1e1e35; border-radius: 8px; height: 6px; margin: 20px 0; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #7b2fff, #ff3cac); border-radius: 8px; animation: progress 2s ease forwards; }
+    @keyframes progress { from { width: 0%; } to { width: 100%; } }
+    .steps { text-align: left; margin: 20px 0; }
+    .step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1e1e35; font-size: 0.9em; }
+    .step:last-child { border-bottom: none; }
+    .step .dot { width: 8px; height: 8px; border-radius: 50%; background: #7b2fff; flex-shrink: 0; }
+    .step.done .dot { background: #22c55e; }
+    .step.done { color: #aaa; }
+    .step.active { color: #fff; }
+    .step.pending { color: #555; }
+    .btn { display: inline-block; padding: 12px 30px; background: linear-gradient(90deg, #7b2fff, #ff3cac); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; margin-top: 10px; border: none; cursor: pointer; font-size: 0.95em; }
+    a.home { color: #7b2fff; text-decoration: none; font-size: 0.85em; display: block; margin-top: 16px; }
+    .error-card { display: none; }
+    .success-card { display: none; }
+    .loading-card { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="card loading-card" id="loadingCard">
+  <div class="icon">🔗</div>
+  <div class="badge">Connecting</div>
+  <h1>Connecting your TikTok...</h1>
+  <p>Please wait while we authenticate your account and prepare your workspace.</p>
+  <div class="progress"><div class="progress-bar"></div></div>
+  <div class="steps">
+    <div class="step done"><div class="dot"></div> TikTok authorisation received</div>
+    <div class="step active"><div class="dot"></div> Verifying account access...</div>
+    <div class="step pending"><div class="dot"></div> Setting up your workspace</div>
+    <div class="step pending"><div class="dot"></div> Ready to generate</div>
+  </div>
+</div>
+
+<div class="card success-card" id="successCard">
+  <div class="icon">✅</div>
+  <div class="badge">Connected</div>
+  <h1>TikTok Connected!</h1>
+  <p>Your account has been successfully linked. You can now generate and publish beat-synced anime edits directly to your TikTok profile.</p>
+  <div class="steps">
+    <div class="step done"><div class="dot"></div> TikTok account authenticated</div>
+    <div class="step done"><div class="dot"></div> Publishing permissions granted</div>
+    <div class="step done"><div class="dot"></div> Workspace ready</div>
+  </div>
+  <button class="btn" onclick="window.location.href='/'">Generate My First Montage →</button>
+  <a class="home" href="/">Back to home</a>
+</div>
+
+<div class="card error-card" id="errorCard">
+  <div class="icon">⚠️</div>
+  <div class="badge">Issue</div>
+  <h1>Something went wrong</h1>
+  <p>We couldn't complete the TikTok connection. This may be because access was denied or the session expired.</p>
+  <button class="btn" onclick="window.location.href='/'">Try Again</button>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code  = params.get('code');
+  const error = params.get('error');
+
+  setTimeout(() => {
+    document.getElementById('loadingCard').style.display  = 'none';
+    if (error || !code) {
+      document.getElementById('errorCard').style.display  = 'block';
+    } else {
+      document.getElementById('successCard').style.display = 'block';
+    }
+  }, 2500);
+</script>
+
+</body>
+</html>
