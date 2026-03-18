@@ -56,7 +56,8 @@
     <div class="step done"><div class="dot"></div> Publishing permissions granted</div>
     <div class="step done"><div class="dot"></div> Workspace ready</div>
   </div>
-  <button class="btn" onclick="window.location.href='/'">Generate My First Montage →</button>
+  <button class="btn" id="generateBtn" onclick="triggerGenerate()">Generate My First Montage →</button>
+  <p id="generateStatus" style="color:#888;font-size:0.85em;margin-top:12px;"></p>
   <a class="home" href="/">Back to home</a>
 </div>
 
@@ -81,6 +82,29 @@
       document.getElementById('successCard').style.display = 'block';
     }
   }, 2500);
+
+  async function triggerGenerate() {
+    const btn = document.getElementById('generateBtn');
+    const status = document.getElementById('generateStatus');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    status.textContent = 'Starting your anime montage...';
+    try {
+      const res = await fetch('https://brantley-subservient-linus.ngrok-free.dev/generate', {
+        method: 'POST',
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
+      const data = await res.json();
+      btn.textContent = '✅ Video Posted to TikTok!';
+      status.textContent = 'Your anime montage is being posted to your TikTok profile. Check in a few minutes!';
+      status.style.color = '#22c55e';
+    } catch(e) {
+      btn.textContent = 'Generate My First Montage →';
+      btn.disabled = false;
+      status.textContent = 'Error connecting to server. Make sure api.py is running.';
+      status.style.color = '#ff4444';
+    }
+  }
 </script>
 
 </body>
