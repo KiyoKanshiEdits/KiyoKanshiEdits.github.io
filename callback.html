@@ -26,7 +26,7 @@
   const code   = params.get('code');
   const state  = params.get('state');
   const error  = params.get('error');
-  const API_BASE = localStorage.getItem('api_base') || '';
+  const API_BASE = 'https://brantley-subservient-linus.ngrok-free.dev';
 
   async function exchangeToken() {
     if (error || !code) {
