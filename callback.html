@@ -12,58 +12,35 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     h1 { font-size: 1.4em; margin-bottom: 10px; }
     p { color: #888; font-size: 0.9em; line-height: 1.6; }
-    .error { color: #ef4444; }
+    .badge { display: inline-block; background: linear-gradient(90deg, #7b2fff33, #ff3cac33); border: 1px solid #7b2fff55; border-radius: 20px; padding: 4px 14px; font-size: 0.8em; color: #cc88ff; margin-bottom: 16px; }
   </style>
 </head>
 <body>
 <div class="card">
   <div class="spinner" id="spinner"></div>
+  <div class="badge" id="badge">Connecting</div>
   <h1 id="title">Connecting TikTok...</h1>
   <p id="msg">Completing authentication, please wait.</p>
 </div>
 <script>
   const params = new URLSearchParams(window.location.search);
   const code   = params.get('code');
-  const state  = params.get('state');
   const error  = params.get('error');
-  const API_BASE = 'https://brantley-subservient-linus.ngrok-free.dev';
 
-  async function exchangeToken() {
-    if (error || !code) {
-      document.getElementById('spinner').style.display = 'none';
-      document.getElementById('title').textContent = 'Connection failed';
-      document.getElementById('msg').innerHTML = '<span class="error">TikTok access was denied. <a href="/" style="color:#7b2fff">Try again</a></span>';
-      return;
-    }
-    if (!API_BASE) {
-      // No API server — go straight to post page
-      document.getElementById('title').textContent = 'Connected!';
-      document.getElementById('msg').textContent = 'Redirecting to post page...';
-      setTimeout(() => window.location.href = '/post.html', 1500);
-      return;
-    }
-    try {
-      const res  = await fetch(`${API_BASE}/auth/token`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-        body:    JSON.stringify({ code, state })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('tiktok_access_token', data.access_token);
-        document.getElementById('title').textContent = 'Connected!';
-        document.getElementById('msg').textContent   = 'Redirecting to post page...';
-        setTimeout(() => window.location.href = `/post.html?api=${encodeURIComponent(API_BASE)}&token=${encodeURIComponent(data.access_token)}`, 1200);
-      } else {
-        throw new Error(JSON.stringify(data.error));
-      }
-    } catch(e) {
-      document.getElementById('spinner').style.display = 'none';
-      document.getElementById('title').textContent = 'Error';
-      document.getElementById('msg').innerHTML = `<span class="error">Token exchange failed. <a href="/" style="color:#7b2fff">Try again</a></span>`;
-    }
+  if (error || !code) {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('badge').textContent = 'Failed';
+    document.getElementById('title').textContent = 'Connection failed';
+    document.getElementById('msg').innerHTML = 'TikTok access was denied. <a href="/" style="color:#7b2fff">Try again</a>';
+  } else {
+    // Auth code received — redirect to post page
+    document.getElementById('badge').textContent = 'Connected';
+    document.getElementById('title').textContent = 'TikTok Connected!';
+    document.getElementById('msg').textContent = 'Redirecting to post page...';
+    setTimeout(() => {
+      window.location.href = '/post.html';
+    }, 1500);
   }
-  exchangeToken();
 </script>
 </body>
 </html>
