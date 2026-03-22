@@ -89,7 +89,7 @@
         <p style="color:#888;font-size:0.9em;">Generating your anime montage...</p>
         <p style="color:#555;font-size:0.8em;margin-top:6px;">This takes about 3 minutes</p>
       </div>
-      <video id="videoPlayer" controls playsinline></video>
+      <video id="videoPlayer" controls playsinline crossorigin="anonymous"></video>
     </div>
   </div>
 
@@ -246,21 +246,11 @@
         // Hide generating, show video player
         document.getElementById('generatingOverlay').style.display = 'none';
 
-        // Try to load the latest video
+        // Point video element directly at API endpoint
         const vid = document.getElementById('videoPlayer');
-        // Load from API
-        try {
-          const vRes = await fetch(`${API_BASE}/latest_video`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-          if (vRes.ok) {
-            const blob = await vRes.blob();
-            vid.src = URL.createObjectURL(blob);
-            vid.style.display = 'block';
-          } else {
-            showVideoReady();
-          }
-        } catch(e) {
-          showVideoReady();
-        }
+        vid.src = `${API_BASE}/latest_video`;
+        vid.style.display = 'block';
+        vid.load();
 
         // Show post phase
         document.getElementById('phaseGenerate').style.display = 'none';
