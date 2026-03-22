@@ -178,7 +178,10 @@
 </div>
 
 <script>
-  const API_BASE = 'https://brantley-subservient-linus.ngrok-free.dev';
+  // Use same origin if served from Flask, otherwise use ngrok
+  const API_BASE = window.location.hostname === '127.0.0.1' 
+    ? '' 
+    : 'https://brantley-subservient-linus.ngrok-free.dev';
   let videoReady = false;
   let pollInterval = null;
 
