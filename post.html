@@ -13,11 +13,9 @@
     @media (max-width: 700px) { .container { grid-template-columns: 1fr; } }
 
     .preview-section h2 { margin-bottom: 16px; font-size: 1.1em; color: #aaa; }
-    .video-preview { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; max-height: 400px; }
-    .video-preview video { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-    .video-placeholder { text-align: center; color: #555; }
-    .video-placeholder .icon { font-size: 3em; margin-bottom: 10px; }
-    .generating { text-align: center; padding: 20px; }
+    .video-preview { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; max-height: 460px; }
+    .video-preview video { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: none; }
+    .overlay { text-align: center; padding: 20px; }
     .spinner { width: 40px; height: 40px; border: 3px solid #1e1e35; border-top-color: #7b2fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -32,7 +30,7 @@
     .field label { font-size: 0.9em; color: #aaa; }
     .field textarea { background: #12121e; border: 1px solid #1e1e35; border-radius: 8px; color: #fff; padding: 12px; font-size: 0.9em; resize: vertical; min-height: 80px; font-family: Arial, sans-serif; }
     .field textarea:focus { outline: none; border-color: #7b2fff; }
-    .field select { background: #12121e; border: 1px solid #1e1e35; border-radius: 8px; color: #fff; padding: 12px; font-size: 0.9em; appearance: none; cursor: pointer; }
+    .field select { background: #12121e; border: 1px solid #1e1e35; border-radius: 8px; color: #fff; padding: 12px; font-size: 0.9em; cursor: pointer; }
     .field select:focus { outline: none; border-color: #7b2fff; }
     .char-count { font-size: 0.8em; color: #555; text-align: right; }
 
@@ -40,18 +38,19 @@
     .interactions h4 { font-size: 0.9em; color: #aaa; margin-bottom: 12px; }
     .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e1e35; }
     .checkbox-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; cursor: pointer; }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; cursor: pointer; flex-shrink: 0; }
     .checkbox-row label { font-size: 0.9em; cursor: pointer; flex: 1; }
-    .checkbox-row .disabled-label { color: #555; }
-    .checkbox-row .hint { font-size: 0.75em; color: #555; }
 
-    .consent-box { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
-    .consent-box input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
-    .consent-box p { font-size: 0.85em; color: #aaa; line-height: 1.6; }
+    .consent-label { display: flex; gap: 12px; align-items: flex-start; background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; cursor: pointer; }
+    .consent-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    .consent-label span { font-size: 0.85em; color: #aaa; line-height: 1.6; }
 
-    .post-btn { padding: 14px; background: linear-gradient(90deg, #7b2fff, #ff3cac); color: #fff; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-    .post-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .post-btn:hover:not(:disabled) { opacity: 0.85; }
+    .btn { padding: 14px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: opacity 0.2s; width: 100%; }
+    .btn-primary { background: linear-gradient(90deg, #7b2fff, #ff3cac); color: #fff; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+    .btn-secondary { background: #12121e; border: 1px solid #7b2fff; color: #7b2fff; }
+    .btn-secondary:hover { background: #1a1a2e; }
 
     .status-box { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; display: none; }
     .status-box.visible { display: block; }
@@ -60,9 +59,12 @@
     .status-dot.pending { background: #555; }
     .status-dot.active { background: #7b2fff; animation: pulse 1s infinite; }
     .status-dot.done { background: #22c55e; }
-    .status-dot.error { background: #ef4444; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
     .notice { font-size: 0.8em; color: #666; margin-top: 8px; }
+
+    /* Phase sections */
+    #phaseGenerate { display: flex; flex-direction: column; gap: 20px; }
+    #phasePost { display: none; flex-direction: column; gap: 20px; }
   </style>
 </head>
 <body>
@@ -78,276 +80,303 @@
   <div class="preview-section">
     <h2>Content Preview</h2>
     <div class="video-preview" id="videoPreview">
-      <div class="generating" id="generatingState">
+      <div class="overlay" id="idleOverlay">
+        <div style="font-size:2.5em;margin-bottom:12px;">🎬</div>
+        <p style="color:#888;font-size:0.9em;">Click Generate to create your anime montage</p>
+      </div>
+      <div class="overlay" id="generatingOverlay" style="display:none;">
         <div class="spinner"></div>
         <p style="color:#888;font-size:0.9em;">Generating your anime montage...</p>
         <p style="color:#555;font-size:0.8em;margin-top:6px;">This takes about 3 minutes</p>
       </div>
-      <video id="videoPlayer" style="display:none;" controls playsinline></video>
+      <video id="videoPlayer" controls playsinline></video>
     </div>
   </div>
 
   <!-- RIGHT: Post Settings -->
   <div class="post-section">
 
-    <!-- Creator Info -->
-    <div class="creator-card" id="creatorCard">
-      <div class="creator-avatar" id="creatorAvatar">?</div>
+    <!-- Creator Info — always visible -->
+    <div class="creator-card">
+      <div class="creator-avatar" id="creatorAvatar">K</div>
       <div class="creator-info">
-        <h3 id="creatorName">Loading...</h3>
-        <p id="creatorHandle">Fetching account info</p>
+        <h3 id="creatorName">KiyoKanshiEdits</h3>
+        <p id="creatorHandle">@kiyokanshiedits</p>
       </div>
       <div class="tiktok-badge">TikTok</div>
     </div>
 
-    <!-- Caption -->
-    <div class="field">
-      <label>Caption</label>
-      <textarea id="caption" maxlength="2200" placeholder="Add a caption for your video..."></textarea>
-      <div class="char-count"><span id="captionCount">0</span> / 2200</div>
+    <!-- PHASE 1: Generate -->
+    <div id="phaseGenerate">
+      <p style="color:#888;font-size:0.9em;line-height:1.6;">Click the button below to generate a beat-synced anime montage. Once it's ready you'll be able to preview it and post it directly to your TikTok.</p>
+      <button class="btn btn-primary" id="generateBtn" onclick="generateVideo()">Generate Anime Montage</button>
     </div>
 
-    <!-- Privacy -->
-    <div class="field">
-      <label>Who can view this post</label>
-      <select id="privacyLevel">
-        <option value="" disabled selected>Select privacy</option>
-      </select>
+    <!-- PHASE 2: Post settings (shown after video is ready) -->
+    <div id="phasePost">
+
+      <div class="field">
+        <label>Caption</label>
+        <textarea id="caption" maxlength="2200" placeholder="Add a caption for your video..."></textarea>
+        <div class="char-count"><span id="captionCount">0</span> / 2200</div>
+      </div>
+
+      <div class="field">
+        <label>Who can view this post</label>
+        <select id="privacyLevel" onchange="checkCanPost()">
+          <option value="" disabled selected>Select privacy</option>
+          <option value="PUBLIC_TO_EVERYONE">Everyone</option>
+          <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+          <option value="FOLLOWER_OF_CREATOR">Followers</option>
+          <option value="SELF_ONLY">Only me</option>
+        </select>
+      </div>
+
+      <div class="interactions">
+        <h4>Allow interactions</h4>
+        <div class="checkbox-row">
+          <input type="checkbox" id="allowComment">
+          <label for="allowComment">Allow Comments</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="allowDuet">
+          <label for="allowDuet">Allow Duet</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="allowStitch">
+          <label for="allowStitch">Allow Stitch</label>
+        </div>
+      </div>
+
+      <label class="consent-label">
+        <input type="checkbox" id="consent" onchange="checkCanPost()">
+        <span>I confirm that I have the rights to post this content and I consent to publishing this video to my TikTok account. I understand it may take a few minutes to appear on my profile.</span>
+      </label>
+
+      <button class="btn btn-primary" id="postBtn" disabled onclick="postToTikTok()">
+        Post to TikTok
+      </button>
+
+      <div class="status-box" id="statusBox">
+        <div class="status-row">
+          <div class="status-dot pending" id="dot1"></div>
+          <span id="status1" style="color:#555;">Sending to TikTok...</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot pending" id="dot2"></div>
+          <span id="status2" style="color:#555;">Processing video</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot pending" id="dot3"></div>
+          <span id="status3" style="color:#555;">Publishing to your profile</span>
+        </div>
+        <p class="notice" id="statusNotice">Please wait — this may take a few minutes.</p>
+      </div>
+
     </div>
-
-    <!-- Interactions -->
-    <div class="interactions">
-      <h4>Allow interactions</h4>
-      <div class="checkbox-row">
-        <input type="checkbox" id="allowComment">
-        <label for="allowComment">Allow Comments</label>
-      </div>
-      <div class="checkbox-row">
-        <input type="checkbox" id="allowDuet">
-        <label for="allowDuet">Allow Duet</label>
-      </div>
-      <div class="checkbox-row">
-        <input type="checkbox" id="allowStitch">
-        <label for="allowStitch">Allow Stitch</label>
-      </div>
-    </div>
-
-    <!-- Consent -->
-    <div class="consent-box" onclick="document.getElementById('consent').click()">
-      <input type="checkbox" id="consent">
-      <p>I confirm that I have the rights to post this content and I consent to publishing this video to my TikTok account. I understand it may take a few minutes to appear on my profile.</p>
-    </div>
-
-    <!-- Post Button -->
-    <button class="post-btn" id="postBtn" disabled onclick="postToTikTok()">
-      Post to TikTok
-    </button>
-
-    <!-- Status -->
-    <div class="status-box" id="statusBox">
-      <div class="status-row">
-        <div class="status-dot" id="dot1"></div>
-        <span id="status1">Sending to TikTok...</span>
-      </div>
-      <div class="status-row">
-        <div class="status-dot pending" id="dot2"></div>
-        <span id="status2" style="color:#555;">Processing video</span>
-      </div>
-      <div class="status-row">
-        <div class="status-dot pending" id="dot3"></div>
-        <span id="status3" style="color:#555;">Publishing to your profile</span>
-      </div>
-      <p class="notice" id="statusNotice">Please wait — this may take a few minutes.</p>
-    </div>
-
   </div>
 </div>
 
 <script>
-  // Get API base from URL params or use stored
-  const params    = new URLSearchParams(window.location.search);
-  const API_BASE  = 'https://brantley-subservient-linus.ngrok-free.dev';
-  const accessToken = localStorage.getItem('tiktok_access_token') || '';
+  const API_BASE = 'https://brantley-subservient-linus.ngrok-free.dev';
+  let videoReady = false;
+  let pollInterval = null;
 
-  // Privacy level labels
-  const PRIVACY_LABELS = {
-    'PUBLIC_TO_EVERYONE':   'Everyone',
-    'MUTUAL_FOLLOW_FRIENDS': 'Friends',
-    'FOLLOWER_OF_CREATOR':  'Followers',
-    'SELF_ONLY':            'Only me'
-  };
-
-  async function init() {
-    await loadCreatorInfo();
-    await generateVideo();
-  }
-
+  // Load creator info on page load
   async function loadCreatorInfo() {
-    if (!API_BASE || !accessToken) {
-      document.getElementById('creatorName').textContent = 'Connected';
-      document.getElementById('creatorHandle').textContent = '@kiyokanshiedits';
-      document.getElementById('creatorAvatar').textContent = 'K';
-      loadDefaultPrivacy();
-      return;
-    }
     try {
       const res  = await fetch(`${API_BASE}/creator/info`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-        body:    JSON.stringify({ access_token: accessToken })
+        body:    JSON.stringify({})
       });
       const data = await res.json();
       const info = data?.data;
-      if (info) {
-        document.getElementById('creatorName').textContent    = info.creator_nickname || 'Creator';
-        document.getElementById('creatorHandle').textContent  = '@' + (info.creator_username || 'kiyokanshiedits');
-        document.getElementById('creatorAvatar').textContent  = (info.creator_nickname || 'K')[0].toUpperCase();
-        // Populate privacy options
-        const sel = document.getElementById('privacyLevel');
-        sel.innerHTML = '<option value="" disabled selected>Select privacy</option>';
-        (info.privacy_level_options || ['PUBLIC_TO_EVERYONE','SELF_ONLY']).forEach(level => {
-          const opt = document.createElement('option');
-          opt.value       = level;
-          opt.textContent = PRIVACY_LABELS[level] || level;
-          sel.appendChild(opt);
-        });
-      } else {
-        loadDefaultPrivacy();
-      }
-    } catch(e) {
-      loadDefaultPrivacy();
-    }
-  }
+      if (info?.creator_nickname) {
+        document.getElementById('creatorName').textContent   = info.creator_nickname;
+        document.getElementById('creatorHandle').textContent = '@' + info.creator_username;
+        document.getElementById('creatorAvatar').textContent = info.creator_nickname[0].toUpperCase();
 
-  function loadDefaultPrivacy() {
-    const sel = document.getElementById('privacyLevel');
-    sel.innerHTML = '<option value="" disabled selected>Select privacy</option>';
-    ['PUBLIC_TO_EVERYONE','MUTUAL_FOLLOW_FRIENDS','FOLLOWER_OF_CREATOR','SELF_ONLY'].forEach(level => {
-      const opt = document.createElement('option');
-      opt.value       = level;
-      opt.textContent = PRIVACY_LABELS[level];
-      sel.appendChild(opt);
-    });
+        // Populate privacy from creator_info
+        if (info.privacy_level_options?.length) {
+          const labels = { PUBLIC_TO_EVERYONE:'Everyone', MUTUAL_FOLLOW_FRIENDS:'Friends', FOLLOWER_OF_CREATOR:'Followers', SELF_ONLY:'Only me' };
+          const sel = document.getElementById('privacyLevel');
+          sel.innerHTML = '<option value="" disabled selected>Select privacy</option>';
+          info.privacy_level_options.forEach(l => {
+            const o = document.createElement('option');
+            o.value = l; o.textContent = labels[l] || l;
+            sel.appendChild(o);
+          });
+        }
+      }
+    } catch(e) { /* keep defaults */ }
   }
 
   async function generateVideo() {
-    if (!API_BASE) {
-      // No API — show placeholder
-      document.getElementById('generatingState').innerHTML = `
-        <div class="video-placeholder">
-          <div class="icon">🎬</div>
-          <p style="color:#888;">Video ready</p>
-          <p style="color:#555;font-size:0.8em;">Start the API server to generate</p>
-        </div>`;
-      checkCanPost();
-      return;
-    }
+    const btn = document.getElementById('generateBtn');
+    btn.disabled    = true;
+    btn.textContent = 'Generating...';
+
+    document.getElementById('idleOverlay').style.display       = 'none';
+    document.getElementById('generatingOverlay').style.display = 'block';
+
     try {
       await fetch(`${API_BASE}/generate`, {
         method: 'POST',
         headers: { 'ngrok-skip-browser-warning': 'true' }
       });
-      // Poll status
-      pollStatus();
+      pollInterval = setInterval(checkPipelineStatus, 5000);
     } catch(e) {
-      document.getElementById('generatingState').innerHTML = '<p style="color:#ef4444;">Could not connect to server</p>';
+      btn.disabled    = false;
+      btn.textContent = 'Generate Anime Montage';
+      document.getElementById('generatingOverlay').style.display = 'none';
+      document.getElementById('idleOverlay').style.display       = 'block';
+      alert('Could not connect to API server. Make sure py api.py is running.');
     }
   }
 
-  async function pollStatus() {
-    const interval = setInterval(async () => {
-      try {
-        const res  = await fetch(`${API_BASE}/status`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        const data = await res.json();
-        if (!data.running) {
-          clearInterval(interval);
-          document.getElementById('generatingState').style.display = 'none';
-          document.getElementById('videoPlayer').style.display     = 'block';
-          document.getElementById('videoPlayer').src = '';  // No direct preview in this flow
-          // Show done state
-          document.getElementById('generatingState').innerHTML = `
-            <div style="text-align:center;padding:20px;">
-              <div style="font-size:2em;margin-bottom:10px;">✅</div>
-              <p style="color:#22c55e;">Video ready!</p>
-            </div>`;
-          document.getElementById('generatingState').style.display = 'block';
-          document.getElementById('videoPlayer').style.display     = 'none';
-          checkCanPost();
+  async function checkPipelineStatus() {
+    try {
+      const res  = await fetch(`${API_BASE}/status`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+      const data = await res.json();
+      if (!data.running) {
+        clearInterval(pollInterval);
+        videoReady = true;
+
+        // Hide generating, show video player
+        document.getElementById('generatingOverlay').style.display = 'none';
+
+        // Try to load the latest video
+        const vid = document.getElementById('videoPlayer');
+        // Load from API
+        try {
+          const vRes = await fetch(`${API_BASE}/latest_video`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+          if (vRes.ok) {
+            const blob = await vRes.blob();
+            vid.src = URL.createObjectURL(blob);
+            vid.style.display = 'block';
+          } else {
+            showVideoReady();
+          }
+        } catch(e) {
+          showVideoReady();
         }
-      } catch(e) { clearInterval(interval); }
-    }, 5000);
+
+        // Show post phase
+        document.getElementById('phaseGenerate').style.display = 'none';
+        document.getElementById('phasePost').style.display     = 'flex';
+      }
+    } catch(e) { /* keep polling */ }
   }
 
-  // Caption counter
+  function showVideoReady() {
+    document.getElementById('videoPreview').innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:2.5em;margin-bottom:12px;">✅</div>
+        <p style="color:#22c55e;font-size:1em;font-weight:bold;">Video ready!</p>
+        <p style="color:#555;font-size:0.8em;margin-top:6px;">Ready to post to TikTok</p>
+      </div>`;
+  }
+
   document.getElementById('caption').addEventListener('input', function() {
     document.getElementById('captionCount').textContent = this.value.length;
     checkCanPost();
   });
 
-  // Consent + privacy check
-  document.getElementById('consent').addEventListener('change', checkCanPost);
-  document.getElementById('privacyLevel').addEventListener('change', checkCanPost);
-
   function checkCanPost() {
-    const consent  = document.getElementById('consent').checked;
-    const privacy  = document.getElementById('privacyLevel').value;
+    const consent = document.getElementById('consent').checked;
+    const privacy = document.getElementById('privacyLevel').value;
     document.getElementById('postBtn').disabled = !(consent && privacy);
   }
 
   async function postToTikTok() {
     const btn = document.getElementById('postBtn');
-    btn.disabled = true;
+    btn.disabled    = true;
     btn.textContent = 'Posting...';
 
     const statusBox = document.getElementById('statusBox');
     statusBox.classList.add('visible');
-
     setStatus(1, 'active', 'Sending to TikTok...');
-    setStatus(2, 'pending', 'Processing video');
-    setStatus(3, 'pending', 'Publishing to your profile');
 
-    // Trigger pipeline which handles the actual posting
     try {
-      if (API_BASE) {
-        await fetch(`${API_BASE}/generate`, {
-          method: 'POST',
-          headers: { 'ngrok-skip-browser-warning': 'true' }
-        });
+      const caption = document.getElementById('caption').value;
+      const res = await fetch(`${API_BASE}/post`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        body:    JSON.stringify({
+          caption:       caption,
+          privacy_level: document.getElementById('privacyLevel').value,
+          disable_comment: !document.getElementById('allowComment').checked,
+          disable_duet:    !document.getElementById('allowDuet').checked,
+          disable_stitch:  !document.getElementById('allowStitch').checked,
+        })
+      });
+      const data = await res.json();
+
+      setStatus(1, 'done', 'Sent to TikTok');
+      setStatus(2, 'active', 'Processing video...');
+
+      // Poll publish status
+      if (data.publish_id) {
+        pollPublishStatus(data.publish_id, btn);
+      } else {
+        setTimeout(() => {
+          setStatus(2, 'done', 'Video processed');
+          setStatus(3, 'active', 'Publishing to your profile...');
+          setTimeout(() => {
+            setStatus(3, 'done', 'Published!');
+            btn.textContent = '✅ Posted to TikTok!';
+            document.getElementById('statusNotice').textContent = 'Your video has been posted! It may take a few minutes to appear on your profile.';
+            document.getElementById('statusNotice').style.color = '#22c55e';
+          }, 5000);
+        }, 3000);
       }
-      setTimeout(() => setStatus(1, 'done', 'Sent to TikTok'), 1500);
-      setTimeout(() => setStatus(2, 'active', 'Processing video...'), 3000);
-      setTimeout(() => {
-        setStatus(2, 'done', 'Video processed');
-        setStatus(3, 'active', 'Publishing to your profile...');
-      }, 8000);
-      setTimeout(() => {
-        setStatus(3, 'done', 'Published!');
-        btn.textContent = '✅ Posted to TikTok!';
-        document.getElementById('statusNotice').textContent = 'Your video has been posted! It may take a few minutes to appear on your profile.';
-        document.getElementById('statusNotice').style.color = '#22c55e';
-      }, 15000);
     } catch(e) {
-      setStatus(1, 'error', 'Error — check API server');
+      setStatus(1, 'error', 'Error connecting to server');
       btn.disabled    = false;
       btn.textContent = 'Post to TikTok';
     }
   }
 
+  async function pollPublishStatus(publishId, btn) {
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      try {
+        const res  = await fetch(`${API_BASE}/publish_status`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+          body:    JSON.stringify({ publish_id: publishId })
+        });
+        const data = await res.json();
+        const status = data.status;
+
+        if (status === 'PUBLISH_COMPLETE') {
+          clearInterval(interval);
+          setStatus(2, 'done', 'Video processed');
+          setStatus(3, 'done', 'Published!');
+          btn.textContent = '✅ Posted to TikTok!';
+          document.getElementById('statusNotice').textContent = 'Your video has been posted!';
+          document.getElementById('statusNotice').style.color = '#22c55e';
+        } else if (status === 'FAILED' || attempts > 30) {
+          clearInterval(interval);
+          setStatus(3, 'error', 'Publish failed');
+          btn.disabled    = false;
+          btn.textContent = 'Post to TikTok';
+        }
+      } catch(e) { /* keep polling */ }
+    }, 5000);
+  }
+
   function setStatus(n, state, text) {
     const dot  = document.getElementById(`dot${n}`);
     const span = document.getElementById(`status${n}`);
-    dot.className  = `status-dot ${state}`;
+    dot.className    = `status-dot ${state}`;
     span.textContent = text;
     span.style.color = state === 'done' ? '#22c55e' : state === 'error' ? '#ef4444' : state === 'active' ? '#fff' : '#555';
   }
 
-  // Store API base if passed
-  const apiBase = params.get('api');
-  if (apiBase) localStorage.setItem('api_base', apiBase);
-  const token = params.get('token');
-  if (token) localStorage.setItem('tiktok_access_token', token);
-
-  init();
+  loadCreatorInfo();
 </script>
 </body>
 </html>
