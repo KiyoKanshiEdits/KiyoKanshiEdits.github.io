@@ -36,14 +36,23 @@
 
     .interactions { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; }
     .interactions h4 { font-size: 0.9em; color: #aaa; margin-bottom: 12px; }
-    .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e1e35; }
-    .checkbox-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* Point 3a: rows highlight when checked */
+    .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid transparent; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
+    .checkbox-row:last-child { margin-bottom: 0; }
     .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; cursor: pointer; flex-shrink: 0; }
     .checkbox-row label { font-size: 0.9em; cursor: pointer; flex: 1; }
+    .checkbox-row.checked { background: #1a0f35; border-color: #7b2fff; }
+    .checkbox-row.checked label { color: #cc88ff; }
+    .checkbox-row.disabled { opacity: 0.35; pointer-events: none; }
 
-    .consent-label { display: flex; gap: 12px; align-items: flex-start; background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; cursor: pointer; }
-    .consent-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: #7b2fff; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    /* Point 4: consent clearly clickable */
+    .consent-label { display: flex; gap: 12px; align-items: flex-start; background: #12121e; border: 2px solid #1e1e35; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+    .consent-label:hover { border-color: #7b2fff55; }
+    .consent-label.checked { background: #1a0f35; border-color: #7b2fff; }
+    .consent-label input[type="checkbox"] { width: 20px; height: 20px; accent-color: #7b2fff; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
     .consent-label span { font-size: 0.85em; color: #aaa; line-height: 1.6; }
+    .consent-label.checked span { color: #cc88ff; }
 
     .btn { padding: 14px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: opacity 0.2s; width: 100%; }
     .btn-primary { background: linear-gradient(90deg, #7b2fff, #ff3cac); color: #fff; }
@@ -134,22 +143,22 @@
 
       <div class="interactions">
         <h4>Allow interactions</h4>
-        <div class="checkbox-row">
+        <div class="checkbox-row" id="rowComment" onclick="toggleInteraction('allowComment','rowComment')">
           <input type="checkbox" id="allowComment">
           <label for="allowComment">Allow Comments</label>
         </div>
-        <div class="checkbox-row">
+        <div class="checkbox-row" id="rowDuet" onclick="toggleInteraction('allowDuet','rowDuet')">
           <input type="checkbox" id="allowDuet">
           <label for="allowDuet">Allow Duet</label>
         </div>
-        <div class="checkbox-row">
+        <div class="checkbox-row" id="rowStitch" onclick="toggleInteraction('allowStitch','rowStitch')">
           <input type="checkbox" id="allowStitch">
           <label for="allowStitch">Allow Stitch</label>
         </div>
       </div>
 
-      <label class="consent-label">
-        <input type="checkbox" id="consent" onchange="checkCanPost()">
+      <label class="consent-label" id="consentLabel">
+        <input type="checkbox" id="consent" onchange="toggleConsent()">
         <span>I confirm that I have the rights to post this content and I consent to publishing this video to my TikTok account. I understand it may take a few minutes to appear on my profile.</span>
       </label>
 
