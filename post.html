@@ -71,6 +71,23 @@
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
     .notice { font-size: 0.8em; color: #666; margin-top: 8px; }
 
+    /* Commercial content disclosure */
+    .disclosure-section { background: #12121e; border: 1px solid #1e1e35; border-radius: 12px; padding: 16px; }
+    .disclosure-section h4 { font-size: 0.9em; color: #aaa; margin-bottom: 4px; }
+    .disclosure-section p { font-size: 0.8em; color: #555; margin-bottom: 12px; }
+    .disclosure-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .disclosure-toggle span { font-size: 0.9em; color: #fff; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 24px; transition: 0.3s; cursor: pointer; }
+    .toggle-slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+    .toggle-switch input:checked + .toggle-slider { background: #7b2fff; }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+    .disclosure-sub { display: none; margin-top: 14px; border-top: 1px solid #1e1e35; padding-top: 14px; }
+    .disclosure-sub.visible { display: block; }
+    .disclosure-prompt { font-size: 0.8em; color: #f59e0b; background: #1a150a; border: 1px solid #f59e0b44; border-radius: 8px; padding: 10px 12px; margin-top: 10px; display: none; }
+    .disclosure-prompt.visible { display: block; }
+
     /* Phase sections */
     #phaseGenerate { display: flex; flex-direction: column; gap: 20px; }
     #phasePost { display: none; flex-direction: column; gap: 20px; }
@@ -157,9 +174,33 @@
         </div>
       </div>
 
+      <!-- Point 3: Commercial Content Disclosure -->
+      <div class="disclosure-section">
+        <h4>Content Disclosure</h4>
+        <p>Indicate if this content promotes a brand, product or service.</p>
+        <label class="disclosure-toggle">
+          <span>Promote a brand, product or service?</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="disclosureToggle" onchange="toggleDisclosure()">
+            <span class="toggle-slider"></span>
+          </label>
+        </label>
+        <div class="disclosure-sub" id="disclosureSub">
+          <div class="checkbox-row" id="rowYourBrand" onclick="toggleInteraction('yourBrand','rowYourBrand'); updateDisclosurePrompt()">
+            <input type="checkbox" id="yourBrand">
+            <label for="yourBrand">Your Brand — you are promoting yourself or your own business</label>
+          </div>
+          <div class="checkbox-row" id="rowBrandedContent" onclick="toggleInteraction('brandedContent','rowBrandedContent'); updateDisclosurePrompt()">
+            <input type="checkbox" id="brandedContent">
+            <label for="brandedContent">Branded Content — you are promoting another brand or third party</label>
+          </div>
+          <div class="disclosure-prompt" id="disclosurePrompt"></div>
+        </div>
+      </div>
+
       <label class="consent-label" id="consentLabel">
         <input type="checkbox" id="consent" onchange="toggleConsent()">
-        <span>I confirm that I have the rights to post this content and I consent to publishing this video to my TikTok account. I understand it may take a few minutes to appear on my profile.</span>
+        <span>By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" style="color:#7b2fff;">Music Usage Confirmation</a>. I confirm I have the rights to post this content and consent to publishing this video to my TikTok account. It may take a few minutes to appear on my profile.</span>
       </label>
 
       <button class="btn btn-primary" id="postBtn" disabled onclick="postToTikTok()">
@@ -368,6 +409,35 @@
         }
       } catch(e) { /* keep polling */ }
     }, 5000);
+  }
+
+  function toggleDisclosure() {
+    const on  = document.getElementById('disclosureToggle').checked;
+    const sub = document.getElementById('disclosureSub');
+    sub.classList.toggle('visible', on);
+    if (!on) {
+      // Reset sub-checkboxes
+      ['yourBrand','brandedContent'].forEach(id => {
+        document.getElementById(id).checked = false;
+        document.getElementById(id === 'yourBrand' ? 'rowYourBrand' : 'rowBrandedContent').classList.remove('checked');
+      });
+      document.getElementById('disclosurePrompt').classList.remove('visible');
+    }
+  }
+
+  function updateDisclosurePrompt() {
+    const yb = document.getElementById('yourBrand').checked;
+    const bc = document.getElementById('brandedContent').checked;
+    const prompt = document.getElementById('disclosurePrompt');
+    if (bc) {
+      prompt.textContent = "Your video will be labeled as 'Paid partnership'";
+      prompt.classList.add('visible');
+    } else if (yb) {
+      prompt.textContent = "Your video will be labeled as 'Promotional content'";
+      prompt.classList.add('visible');
+    } else {
+      prompt.classList.remove('visible');
+    }
   }
 
   function setStatus(n, state, text) {
