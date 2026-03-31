@@ -149,7 +149,7 @@
 
       <div class="field">
         <label>Who can view this post</label>
-        <select id="privacyLevel" onchange="checkCanPost()">
+        <select id="privacyLevel" onchange="handlePrivacyChange()">
           <option value="" disabled selected>Select privacy</option>
           <option value="PUBLIC_TO_EVERYONE">Everyone</option>
           <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
@@ -325,6 +325,23 @@
     document.getElementById('captionCount').textContent = this.value.length;
     checkCanPost();
   });
+
+  function handlePrivacyChange() {
+    const isPrivate = document.getElementById('privacyLevel').value === 'SELF_ONLY';
+    const pairs = [['rowDuet','allowDuet'],['rowStitch','allowStitch']];
+    pairs.forEach(([rowId, cbId]) => {
+      const row = document.getElementById(rowId);
+      const cb  = document.getElementById(cbId);
+      if (isPrivate) {
+        row.classList.add('disabled');
+        row.classList.remove('checked');
+        cb.checked = false;
+      } else {
+        row.classList.remove('disabled');
+      }
+    });
+    checkCanPost();
+  }
 
   function checkCanPost() {
     const consent = document.getElementById('consent').checked;
