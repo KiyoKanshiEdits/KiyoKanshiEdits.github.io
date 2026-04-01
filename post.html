@@ -344,9 +344,36 @@
   }
 
   function checkCanPost() {
-    const consent = document.getElementById('consent').checked;
-    const privacy = document.getElementById('privacyLevel').value;
-    document.getElementById('postBtn').disabled = !(consent && privacy);
+    const consent  = document.getElementById('consent').checked;
+    const privacy  = document.getElementById('privacyLevel').value;
+    const discOn   = document.getElementById('disclosureToggle').checked;
+    const yourBrand = document.getElementById('yourBrand').checked;
+    const branded   = document.getElementById('brandedContent').checked;
+
+    // If disclosure is on, at least one sub-option must be checked
+    const disclosureOk = !discOn || yourBrand || branded;
+
+    const btn = document.getElementById('postBtn');
+    btn.disabled = !(consent && privacy && disclosureOk);
+    if (discOn && !yourBrand && !branded) {
+      btn.title = 'You need to indicate if your content promotes yourself, a third party, or both';
+    } else {
+      btn.title = '';
+    }
+
+    // Update consent text dynamically (Point 4)
+    updateConsentText();
+  }
+
+  function updateConsentText() {
+    const discOn  = document.getElementById('disclosureToggle').checked;
+    const branded = document.getElementById('brandedContent').checked;
+    const consentSpan = document.querySelector('.consent-label span');
+    if (discOn && branded) {
+      consentSpan.innerHTML = 'By posting, you agree to TikTok\'s <a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" style="color:#7b2fff;">Branded Content Policy</a> and <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" style="color:#7b2fff;">Music Usage Confirmation</a>. I confirm I have the rights to post this content and consent to publishing this video to my TikTok account.';
+    } else {
+      consentSpan.innerHTML = 'By posting, you agree to TikTok\'s <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" style="color:#7b2fff;">Music Usage Confirmation</a>. I confirm I have the rights to post this content and consent to publishing this video to my TikTok account. It may take a few minutes to appear on my profile.';
+    }
   }
 
   async function postToTikTok() {
@@ -433,27 +460,56 @@
     const sub = document.getElementById('disclosureSub');
     sub.classList.toggle('visible', on);
     if (!on) {
-      // Reset sub-checkboxes
       ['yourBrand','brandedContent'].forEach(id => {
         document.getElementById(id).checked = false;
         document.getElementById(id === 'yourBrand' ? 'rowYourBrand' : 'rowBrandedContent').classList.remove('checked');
       });
       document.getElementById('disclosurePrompt').classList.remove('visible');
+      // Re-enable Only me if it was disabled
+      enablePrivateOption();
     }
+    checkCanPost();
   }
 
   function updateDisclosurePrompt() {
     const yb = document.getElementById('yourBrand').checked;
     const bc = document.getElementById('brandedContent').checked;
     const prompt = document.getElementById('disclosurePrompt');
-    if (bc) {
-      prompt.textContent = "Your video will be labeled as 'Paid partnership'";
-      prompt.classList.add('visible');
-    } else if (yb) {
-      prompt.textContent = "Your video will be labeled as 'Promotional content'";
+    if (bc || yb) {
+      prompt.textContent = bc ? "Your video will be labeled as 'Paid partnership'" : "Your video will be labeled as 'Promotional content'";
       prompt.classList.add('visible');
     } else {
       prompt.classList.remove('visible');
+    }
+    // Point 3b: disable Only me when Branded Content is checked
+    if (bc) {
+      disablePrivateOption();
+    } else {
+      enablePrivateOption();
+    }
+    checkCanPost();
+  }
+
+  function disablePrivateOption() {
+    const sel = document.getElementById('privacyLevel');
+    for (let opt of sel.options) {
+      if (opt.value === 'SELF_ONLY') {
+        opt.disabled = true;
+        opt.title = 'Branded content visibility cannot be set to private';
+        if (sel.value === 'SELF_ONLY') {
+          sel.value = '';
+        }
+      }
+    }
+  }
+
+  function enablePrivateOption() {
+    const sel = document.getElementById('privacyLevel');
+    for (let opt of sel.options) {
+      if (opt.value === 'SELF_ONLY') {
+        opt.disabled = false;
+        opt.title = '';
+      }
     }
   }
 
